@@ -6,31 +6,35 @@ type Props = {
   entry: ConcordanceEntry | null;
 };
 
-type Position = { top: number; left: number; dropHeight: number };
+type Position = {
+  top: number;
+  left: number;
+  dropHeight: number;
+  flipped: boolean;
+};
 
-const DESIRED_DROP = 230;
 const DOT_GAP = 4;
-const MIN_TOP = 10;
+const MIN_TOP = -150;
 const MIN_DROP = 170;
+const DETAILS_WIDTH = 260;
+const DETAILS_OFFSET = 12;
+const EDGE_BUFFER = 16;
 
 function computePosition(target: HTMLElement): Position {
   const lx = target.offsetLeft;
   const ly = target.offsetTop;
 
-  let dropHeight = DESIRED_DROP;
-  let topY = ly - DOT_GAP - dropHeight;
+  const available = ly - DOT_GAP - MIN_TOP;
+  const dropHeight = Math.max(MIN_DROP, available);
+  const topY = ly - DOT_GAP - dropHeight;
+  const left = lx + target.offsetWidth / 2;
 
-  if (topY < MIN_TOP) {
-    const offset = MIN_TOP - topY;
-    dropHeight = Math.max(MIN_DROP, dropHeight - offset);
-    topY = ly - DOT_GAP - dropHeight;
-  }
+  const parent = target.offsetParent as HTMLElement | null;
+  const parentWidth = parent?.clientWidth ?? Infinity;
+  const flipped =
+    left + DETAILS_OFFSET + DETAILS_WIDTH + EDGE_BUFFER > parentWidth;
 
-  return {
-    top: topY,
-    left: lx + target.offsetWidth / 2,
-    dropHeight,
-  };
+  return { top: topY, left, dropHeight, flipped };
 }
 
 export default function WordInfo({ target, entry }: Props) {
@@ -56,7 +60,7 @@ export default function WordInfo({ target, entry }: Props) {
 
   return (
     <div
-      className="word-info"
+      className={`word-info${pos.flipped ? " word-info-flipped" : ""}`}
       style={{ top: pos.top, left: pos.left, height: pos.dropHeight }}
     >
       <svg
@@ -66,7 +70,11 @@ export default function WordInfo({ target, entry }: Props) {
         style={{ height: pos.dropHeight }}
       >
         <polyline
-          points={`42,2 2,2 2,${pos.dropHeight}`}
+          points={
+            pos.flipped
+              ? `-40,2 2,2 2,${pos.dropHeight}`
+              : `42,2 2,2 2,${pos.dropHeight}`
+          }
           className="word-info-line"
         />
       </svg>
