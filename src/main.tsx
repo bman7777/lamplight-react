@@ -6,14 +6,17 @@ import Verse from './routes/Verse.tsx'
 import { verseLoader } from './routes/verseLoader.ts'
 import ErrorPage from './routes/ErrorPage.tsx'
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Verse />,
-    loader: verseLoader,
-    errorElement: <ErrorPage />,
-  },
-])
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <Verse />,
+      loader: verseLoader,
+      errorElement: <ErrorPage />,
+    },
+  ],
+  { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/' },
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
