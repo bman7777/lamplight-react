@@ -2,7 +2,7 @@ export type Token =
   | { type: "fragment"; id: string; text: string }
   | { type: "text"; text: string };
 
-const TAG = /<([GH]\d+)>([\s\S]+?)<\/\1>/g;
+const TAG = /<([GH]\d+)>([\s\S]+?)<\/\1>|<\s*>([\s\S]+?)<\s*\/\s*>/g;
 
 export function parseVerse(text: string): Token[] {
   const tokens: Token[] = [];
@@ -13,7 +13,11 @@ export function parseVerse(text: string): Token[] {
     if (match.index > lastIndex) {
       tokens.push({ type: "text", text: text.slice(lastIndex, match.index) });
     }
-    tokens.push({ type: "fragment", id: match[1], text: match[2] });
+    if (match[1]) {
+      tokens.push({ type: "fragment", id: match[1], text: match[2] });
+    } else {
+      tokens.push({ type: "text", text: match[3] });
+    }
     lastIndex = TAG.lastIndex;
   }
 
