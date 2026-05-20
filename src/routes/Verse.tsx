@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import VerseText from "../components/VerseText";
 import WordInfo from "../components/WordInfo";
 import { parseVerse } from "../lib/parseVerse";
-import { fetchConcordance } from "../lib/concordance";
+import { fetchConcordance, type ConcordanceEntry } from "../lib/concordance";
 import type { VerseData } from "./verseLoader";
 import "./Verse.css";
 
@@ -13,6 +13,7 @@ export default function Verse() {
 
   const [clickedKey, setClickedKey] = useState<string | null>(null);
   const [clickedTarget, setClickedTarget] = useState<HTMLElement | null>(null);
+  const [entry, setEntry] = useState<ConcordanceEntry | null>(null);
 
   const handleClick = (key: string, element: HTMLElement) => {
     if (clickedKey === key) {
@@ -27,7 +28,26 @@ export default function Verse() {
   const clickedStrongsId = clickedKey
     ? clickedKey.split("-").slice(1).join("-")
     : null;
-  const entry = clickedStrongsId ? fetchConcordance(clickedStrongsId) : null;
+
+  useEffect(() => {
+    if (!clickedStrongsId) {
+      setEntry(null);
+      return;
+    }
+    let cancelled = false;
+    setEntry(null);
+    fetchConcordance(clickedStrongsId)
+      .then((result) => {
+        if (!cancelled) setEntry(result);
+      })
+      .catch((err) => {
+        console.warn(`Concordance ${clickedStrongsId}: fetch failed`, err);
+        if (!cancelled) setEntry(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [clickedStrongsId]);
 
   return (
     <main className="verse-page">
