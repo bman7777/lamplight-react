@@ -81,8 +81,13 @@ export default function WordInfo({ target, entry }: Props) {
       <div className="word-info-details">
         <div className="word-info-description">{entry.description}</div>
         <div className="concept-row">
-          <div className="left-concept">{entry.native}</div>
-          <div className="right-concept">{entry.english}</div>
+          <div className="left-concept">{entry.translation}</div>
+          {entry.alternates.map((alt) => (
+            <div key={alt} className="middle-concept">
+              {alt}
+            </div>
+          ))}
+          <div className="right-concept">{entry.original}</div>
         </div>
       </div>
       <div className="word-info-dot" />
