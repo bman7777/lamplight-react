@@ -33,9 +33,14 @@ export function criterionLabel(c: SearchCriterion): string {
 
 export async function searchVerses(
   criteria: SearchCriterion[],
+  opts: { page: number; limit: number },
   signal?: AbortSignal,
 ): Promise<SearchResponse> {
-  const res = await fetch("/ll/search/", {
+  const qs = new URLSearchParams({
+    page: String(opts.page),
+    limit: String(opts.limit),
+  });
+  const res = await fetch(`/ll/search/?${qs}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ criteria }),
@@ -45,4 +50,8 @@ export async function searchVerses(
     throw new Error(`Search failed: ${res.status}`);
   }
   return (await res.json()) as SearchResponse;
+}
+
+export function totalPages(total: number, limit: number): number {
+  return Math.max(1, Math.ceil(total / limit));
 }
