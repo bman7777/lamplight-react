@@ -1,0 +1,142 @@
+.search-results {
+  margin: 16px auto 0;
+  max-width: 760px;
+  font-family: "Lato", sans-serif;
+}
+
+.search-results-message {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--vp-muted);
+  font-size: 14px;
+}
+
+.search-results-error {
+  color: var(--vp-main);
+}
+
+.search-results-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.search-results-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 24px;
+  align-items: baseline;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: var(--vp-text);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.search-results-row:hover,
+.search-results-row:focus-visible {
+  background: #fffefc;
+  border-left-color: var(--vp-main-low);
+  outline: none;
+}
+
+.search-results-ref {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.search-results-ref-book {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--vp-main);
+}
+
+.search-results-ref-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--vp-text);
+}
+
+.search-results-text {
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--vp-text);
+}
+
+.search-results-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 8px;
+}
+
+.search-results-pager-btn {
+  border: 1px solid #d8d2c8;
+  background: var(--vp-bg);
+  color: var(--vp-main);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.search-results-pager-btn:hover:not(:disabled) {
+  background: var(--vp-main-low);
+  border-color: var(--vp-main-med);
+}
+
+.search-results-pager-btn:disabled {
+  color: var(--vp-muted);
+  border-color: #e6e0d6;
+  cursor: not-allowed;
+}
+
+.search-results-pager-label {
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--vp-muted);
+}
+
+@media (max-width: 720px) {
+  .search-results-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 12px 10px;
+  }
+  .search-results-ref {
+    flex-direction: row;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .search-results-ref-num {
+    font-size: 14px;
+  }
+}

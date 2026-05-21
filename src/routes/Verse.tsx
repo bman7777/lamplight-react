@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
+import SearchResults from "../components/SearchResults";
 import VerseText from "../components/VerseText";
 import WordInfo from "../components/WordInfo";
 import { parseVerse } from "../lib/parseVerse";
@@ -9,18 +10,27 @@ import {
   criterionKey,
   searchVerses,
   type SearchCriterion,
+  type SearchVerse,
 } from "../lib/search";
 import type { VerseData } from "./verseLoader";
 import "./Verse.css";
 
+const PAGE_SIZE = 20;
+
 export default function Verse() {
-  const data = useLoaderData() as VerseData;
-  const tokens = useMemo(() => parseVerse(data.text), [data.text]);
+  const loader = useLoaderData() as VerseData;
+  const [active, setActive] = useState<VerseData>(loader);
+  const tokens = useMemo(() => parseVerse(active.text), [active.text]);
 
   const [clickedKey, setClickedKey] = useState<string | null>(null);
   const [clickedTarget, setClickedTarget] = useState<HTMLElement | null>(null);
   const [entry, setEntry] = useState<ConcordanceEntry | null>(null);
   const [criteria, setCriteria] = useState<SearchCriterion[]>([]);
+  const [results, setResults] = useState<SearchVerse[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const addCriterion = useCallback((c: SearchCriterion) => {
     setCriteria((prev) => {
@@ -83,27 +93,57 @@ export default function Verse() {
   }, [clickedStrongsId]);
 
   useEffect(() => {
-    if (criteria.length === 0) return;
-    const controller = new AbortController();
-    searchVerses(criteria, controller.signal)
-      .then((res) => {
-        console.log("search results", res);
-      })
-      .catch((err) => {
-        if (err.name !== "AbortError") {
-          console.warn("Search failed", err);
-        }
-      });
-    return () => controller.abort();
+    setPage(1);
   }, [criteria]);
+
+  useEffect(() => {
+    if (criteria.length === 0) {
+      setResults([]);
+      setTotal(0);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setLoading(true);
+      searchVerses(criteria, { page, limit: PAGE_SIZE }, controller.signal)
+        .then((res) => {
+          setResults(res.verses);
+          setTotal(res.total);
+          setError(null);
+        })
+        .catch((err) => {
+          if (err.name === "AbortError") return;
+          console.warn("Search failed", err);
+          setError("Search failed");
+          setResults([]);
+          setTotal(0);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 200);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [criteria, page]);
+
+  const handleSelectResult = useCallback((v: SearchVerse) => {
+    setActive(v);
+    setClickedKey(null);
+    setClickedTarget(null);
+    setEntry(null);
+  }, []);
 
   return (
     <main className="verse-page">
       <div className="verse-container">
         <div className="verse-reference">
-          <span className="verse-reference-book">{data.book}</span>
+          <span className="verse-reference-book">{active.book}</span>
           <span className="verse-reference-num">
-            {data.chapter}:{data.verse}
+            {active.chapter}:{active.verse}
           </span>
         </div>
         <div className="verse-content">
@@ -123,6 +163,19 @@ export default function Verse() {
             criteria={criteria}
             onAdd={addCriterion}
             onRemove={removeCriterion}
+          />
+        </div>
+        <div className="verse-search-row">
+          <SearchResults
+            results={results}
+            total={total}
+            page={page}
+            pageSize={PAGE_SIZE}
+            loading={loading}
+            error={error}
+            hasCriteria={criteria.length > 0}
+            onPageChange={setPage}
+            onSelect={handleSelectResult}
           />
         </div>
       </div>
