@@ -23,9 +23,10 @@ export default function VerseText({
           <span
             key={key}
             className={isClicked ? "clicked-word" : "kw"}
+            data-text={token.text}
             onClick={(e) => onFragmentClick(key, e.currentTarget)}
           >
-            {token.text}
+            <span className="kw-text">{token.text}</span>
           </span>
         );
       })}

@@ -39,7 +39,7 @@ export function fetchConcordance(strongsId: string): Promise<ConcordanceEntry> {
     const data = (await res.json()) as ConcordanceResponse;
     const alternates = data.english_translations
       .slice(1, 3)
-      .filter((t) => t.count > 1)
+      .filter((t) => t.count > 1 && t.translation.toLowerCase() !== "miscellaneous")
       .map((t) => truncate(t.translation, MAX_TRANSLATION));
     const primary = data.english_translations[0]?.translation ?? "";
     const description = truncate(

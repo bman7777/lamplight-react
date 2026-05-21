@@ -64,9 +64,23 @@
 }
 
 .kw {
-  display: inline;
+  display: inline-grid;
+  vertical-align: baseline;
   color: #6b6058;
   transition: color 120ms ease;
+}
+
+.kw::before,
+.kw .kw-text {
+  grid-area: 1 / 1;
+}
+
+.kw::before {
+  content: attr(data-text) / "";
+  font-style: italic;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
 }
 
 .kw:hover {
