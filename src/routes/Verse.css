@@ -63,6 +63,10 @@
   margin: 0;
 }
 
+.verse-search-row {
+  grid-column: 1 / -1;
+}
+
 .kw {
   display: inline-grid;
   vertical-align: baseline;
@@ -190,6 +194,18 @@
   background-color: var(--vp-bg);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.concept-clickable {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.concept-clickable:hover {
+  border-color: var(--vp-main);
+  color: var(--vp-main);
+  background-color: #fffefc;
 }
 
 .left-concept {
