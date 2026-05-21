@@ -4,6 +4,7 @@ import type { ConcordanceEntry } from "../lib/concordance";
 type Props = {
   target: HTMLElement | null;
   entry: ConcordanceEntry | null;
+  onConceptClick?: (kind: "english" | "original", value: string) => void;
 };
 
 type Position = {
@@ -37,7 +38,7 @@ function computePosition(target: HTMLElement): Position {
   return { top: topY, left, dropHeight, flipped };
 }
 
-export default function WordInfo({ target, entry }: Props) {
+export default function WordInfo({ target, entry, onConceptClick }: Props) {
   const [pos, setPos] = useState<Position | null>(null);
 
   useLayoutEffect(() => {
@@ -81,13 +82,27 @@ export default function WordInfo({ target, entry }: Props) {
       <div className="word-info-details">
         <div className="word-info-description">{entry.description}</div>
         <div className="concept-row">
-          <div className="left-concept">{entry.translation}</div>
+          <div
+            className="left-concept concept-clickable"
+            onClick={() => onConceptClick?.("english", entry.translation)}
+          >
+            {entry.translation}
+          </div>
           {entry.alternates.map((alt) => (
-            <div key={alt} className="middle-concept">
+            <div
+              key={alt}
+              className="middle-concept concept-clickable"
+              onClick={() => onConceptClick?.("english", alt)}
+            >
               {alt}
             </div>
           ))}
-          <div className="right-concept">{entry.original}</div>
+          <div
+            className="right-concept concept-clickable"
+            onClick={() => onConceptClick?.("original", entry.original)}
+          >
+            {entry.original}
+          </div>
         </div>
       </div>
       <div className="word-info-dot" />
