@@ -44,6 +44,10 @@ export default function Verse() {
     setCriteria((prev) => prev.filter((c) => criterionKey(c) !== key));
   }, []);
 
+  const clearCriteria = useCallback(() => {
+    setCriteria([]);
+  }, []);
+
   const handleClick = (key: string, element: HTMLElement) => {
     if (clickedKey === key) {
       setClickedKey(null);
@@ -163,6 +167,7 @@ export default function Verse() {
             criteria={criteria}
             onAdd={addCriterion}
             onRemove={removeCriterion}
+            onClear={clearCriteria}
           />
         </div>
         <div className="verse-search-row">

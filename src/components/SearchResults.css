@@ -15,67 +15,80 @@
   color: var(--vp-main);
 }
 
-.search-results-list {
+.search-results-groups {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 18px;
+}
+
+.search-results-group {
+  list-style: none;
+  position: relative;
+  padding: 4px 0 6px 16px;
+  border-left: 2px solid var(--vp-main-low);
+  background: rgba(139, 0, 0, 0.025);
+  border-radius: 0 8px 8px 0;
+}
+
+.search-results-group-book {
+  font-family: "Lato", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--vp-main);
+  margin: 6px 0 8px;
+  padding: 0;
+}
+
+.search-results-group-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .search-results-row {
   display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 24px;
+  grid-template-columns: 56px 1fr;
+  gap: 14px;
   align-items: baseline;
   width: 100%;
-  padding: 14px 16px;
+  padding: 7px 12px 7px 4px;
   border: none;
-  border-left: 3px solid transparent;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
   text-align: left;
   font: inherit;
   color: var(--vp-text);
   cursor: pointer;
-  transition:
-    background-color 120ms ease,
-    border-color 120ms ease;
+  transition: background-color 120ms ease;
 }
 
 .search-results-row:hover,
 .search-results-row:focus-visible {
-  background: #fffefc;
-  border-left-color: var(--vp-main-low);
+  background: rgba(255, 255, 255, 0.75);
   outline: none;
 }
 
-.search-results-ref {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  line-height: 1.2;
-}
-
-.search-results-ref-book {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--vp-main);
-}
-
 .search-results-ref-num {
-  font-size: 18px;
+  font-family: "Lato", sans-serif;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--vp-text);
+  letter-spacing: 0.3px;
+  color: var(--vp-main);
+  text-align: right;
+  white-space: nowrap;
 }
 
 .search-results-text {
   font-family: "Libre Baskerville", Georgia, serif;
-  font-style: italic;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.55;
   color: var(--vp-text);
 }
@@ -126,17 +139,22 @@
 }
 
 @media (max-width: 720px) {
-  .search-results-row {
-    grid-template-columns: 1fr;
-    gap: 4px;
-    padding: 12px 10px;
+  .search-results-group {
+    padding-left: 12px;
   }
-  .search-results-ref {
-    flex-direction: row;
-    gap: 8px;
-    align-items: baseline;
+  .search-results-group-book {
+    font-size: 13px;
+    letter-spacing: 1.2px;
+  }
+  .search-results-row {
+    grid-template-columns: 48px 1fr;
+    gap: 10px;
+    padding: 6px 8px 6px 0;
   }
   .search-results-ref-num {
+    font-size: 11px;
+  }
+  .search-results-text {
     font-size: 14px;
   }
 }

@@ -11,6 +11,21 @@ function plainText(text: string): string {
     .trim();
 }
 
+type ResultGroup = { book: string; verses: SearchVerse[] };
+
+function groupByBook(results: SearchVerse[]): ResultGroup[] {
+  const groups: ResultGroup[] = [];
+  for (const v of results) {
+    const last = groups[groups.length - 1];
+    if (last && last.book === v.book) {
+      last.verses.push(v);
+    } else {
+      groups.push({ book: v.book, verses: [v] });
+    }
+  }
+  return groups;
+}
+
 type Props = {
   results: SearchVerse[];
   total: number;
@@ -66,25 +81,32 @@ export default function SearchResults({
 
   const pages = totalPages(total, pageSize);
   const showPager = total > pageSize;
+  const groups = groupByBook(results);
 
   return (
     <div className="search-results">
-      <ul className="search-results-list">
-        {results.map((v) => (
-          <li key={`${v.book}-${v.chapter}-${v.verse}`}>
-            <button
-              type="button"
-              className="search-results-row"
-              onClick={() => onSelect(v)}
-            >
-              <span className="search-results-ref">
-                <span className="search-results-ref-book">{v.book}</span>
-                <span className="search-results-ref-num">
-                  {v.chapter}:{v.verse}
-                </span>
-              </span>
-              <span className="search-results-text">{plainText(v.text)}</span>
-            </button>
+      <ul className="search-results-groups">
+        {groups.map((g, gi) => (
+          <li key={`${g.book}-${gi}`} className="search-results-group">
+            <h3 className="search-results-group-book">{g.book}</h3>
+            <ul className="search-results-group-list">
+              {g.verses.map((v) => (
+                <li key={`${v.book}-${v.chapter}-${v.verse}`}>
+                  <button
+                    type="button"
+                    className="search-results-row"
+                    onClick={() => onSelect(v)}
+                  >
+                    <span className="search-results-ref-num">
+                      {v.chapter}:{v.verse}
+                    </span>
+                    <span className="search-results-text">
+                      {plainText(v.text)}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>
