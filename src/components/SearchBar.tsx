@@ -7,6 +7,7 @@ type Props = {
   criteria: SearchCriterion[];
   onAdd: (criterion: SearchCriterion) => void;
   onRemove: (key: string) => void;
+  onClear: () => void;
 };
 
 type PendingType = "text" | "author" | "speaker" | "book";
@@ -17,7 +18,7 @@ const TYPED_TYPES: { value: PendingType; label: string }[] = [
   { value: "book", label: "Book" },
 ];
 
-export default function SearchBar({ criteria, onAdd, onRemove }: Props) {
+export default function SearchBar({ criteria, onAdd, onRemove, onClear }: Props) {
   const [text, setText] = useState("");
   const [pendingType, setPendingType] = useState<PendingType>("text");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,6 +39,27 @@ export default function SearchBar({ criteria, onAdd, onRemove }: Props) {
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [menuOpen]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (pendingType !== "text") {
+        setPendingType("text");
+        return;
+      }
+      if (criteria.length === 0 && text === "") return;
+      setText("");
+      if (criteria.length > 0) onClear();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [pendingType, criteria.length, text, onClear]);
+
+  const clearAll = () => {
+    setText("");
+    setPendingType("text");
+    onClear();
+  };
 
   const commitText = () => {
     const trimmed = text.trim();
@@ -82,6 +104,7 @@ export default function SearchBar({ criteria, onAdd, onRemove }: Props) {
       : `type ${pendingType} name…`;
 
   return (
+    <>
     <div className="search-bar">
       <div className="search-bar-scroll" ref={scrollRef}>
         {criteria.map((c) => {
@@ -174,5 +197,27 @@ export default function SearchBar({ criteria, onAdd, onRemove }: Props) {
         )}
       </div>
     </div>
+    {criteria.length > 0 && (
+      <div className="search-bar-clear-hint">
+        <span>
+          Press <kbd>Esc</kbd> to clear search
+        </span>
+        <button
+          type="button"
+          className="search-bar-clear-x"
+          aria-label="Clear search"
+          onClick={clearAll}
+        >
+          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden>
+            <circle cx="8" cy="8" r="7" className="search-bar-clear-circle" />
+            <path
+              d="M5 5 L11 11 M11 5 L5 11"
+              className="search-bar-clear-stroke"
+            />
+          </svg>
+        </button>
+      </div>
+    )}
+    </>
   );
 }
