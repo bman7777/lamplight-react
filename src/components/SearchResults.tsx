@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import type { SearchVerse } from "../lib/search";
+import bookLoader from "../assets/book-loader.gif";
 import { totalPages } from "../lib/search";
 import { parseVerse } from "../lib/parseVerse";
 import "./SearchResults.css";
@@ -9,6 +11,25 @@ function plainText(text: string): string {
     .join("")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+// Fast searches finish before this elapses, so the loader never flashes for them.
+const LOADER_DELAY_MS = 450;
+
+function useDelayedLoader(loading: boolean): boolean {
+  const [elapsed, setElapsed] = useState(false);
+
+  useEffect(() => {
+    // Arming on the way up and disarming on the way down keeps each search
+    // waiting out the full delay again.
+    const timer = setTimeout(
+      () => setElapsed(loading),
+      loading ? LOADER_DELAY_MS : 0,
+    );
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  return loading && elapsed;
 }
 
 type ResultGroup = { book: string; verses: SearchVerse[] };
@@ -49,6 +70,8 @@ export default function SearchResults({
   onPageChange,
   onSelect,
 }: Props) {
+  const showLoader = useDelayedLoader(loading);
+
   if (!hasCriteria) return null;
 
   if (error) {
@@ -64,7 +87,22 @@ export default function SearchResults({
   if (loading && results.length === 0) {
     return (
       <div className="search-results">
-        <div className="search-results-message">Searching…</div>
+        {showLoader && (
+          <div
+            className="search-results-message"
+            role="status"
+            aria-live="polite"
+          >
+            <img
+              className="search-results-loader"
+              src={bookLoader}
+              alt="Searching…"
+              width={128}
+              height={85}
+              decoding="async"
+            />
+          </div>
+        )}
       </div>
     );
   }
